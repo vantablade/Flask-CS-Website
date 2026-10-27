@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% from "_macros.html" import runner %}
+{% block title %}{{ topic.title }}{% endblock %}
+{% block slug %}{{ topic.slug }}{% endblock %}
+{% block content %}
+<article class="lesson">
+  <div class="eyebrow">{{ groups[topic.group] }} · Spec {{ topic.spec }}</div>
+  <h1>{{ topic.title }}</h1>
+  <p class="lead">{{ topic.summary }}</p>
+
+  <nav class="toc">
+    <strong>On this page</strong>
+    <ol>
+      {% for s in topic.sections %}<li><a href="#s{{ loop.index }}">{{ s.heading }}</a></li>{% endfor %}
+      {% if topic.quiz %}<li><a href="#quiz">Quick quiz</a></li>{% endif %}
+      {% if topic.challenges %}<li><a href="#challenges">Coding challenge{{ 's' if topic.challenges|length > 1 }}</a></li>{% endif %}
+    </ol>
+  </nav>
+
+  {% for s in topic.sections %}
+  <section id="s{{ loop.index }}">
+    <h2>{{ s.heading }}</h2>
+    {{ s.body|safe }}
+    {% if s.code %}{{ runner(s.code) }}{% endif %}
+  </section>
+  {% endfor %}
+
+  <aside class="tip"><strong>Exam tip</strong><p>{{ topic.exam_tip|safe }}</p></aside>
+
+  {% if topic.quiz %}
+  <section id="quiz" class="quiz">
+    <h2>Quick quiz</h2>
+    {% for q in topic.quiz %}
+    <div class="q" data-answer="{{ q.answer }}">
+      <p class="q-text"><span class="qn">{{ loop.index }}</span> {{ q.q|safe }}</p>
+      <div class="opts">
+        {% for opt in q.options %}<button class="opt">{{ opt }}</button>{% endfor %}
+      </div>
+      <p class="why" hidden>{{ q.explain }}</p>
+    </div>
+    {% endfor %}
+    <div class="quiz-foot"><span class="quiz-score"></span><button class="btn ghost" data-action="retry">Retry quiz</button></div>
+  </section>
+  {% endif %}
+
+  {% if topic.challenges %}
+  <section id="challenges">
+    <h2>Coding challenge{{ 's' if topic.challenges|length > 1 }}</h2>
+    {% for ch in topic.challenges %}
+    <div class="challenge runner" data-runner data-challenge="{{ loop.index0 }}" data-tests='{{ ch.tests|tojson }}'>
+      <div class="ch-head">
+        <h3>{{ ch.title }} <span class="solved-tag">✓ Solved</span></h3>
+        <p>{{ ch.task|safe }}</p>
+        <details><summary>Hint</summary><p>{{ ch.hint }}</p></details>
+      </div>
+      <div class="runner-bar">
+        <span class="fname">challenge.py</span>
+        <div class="actions">
+          <button class="btn ghost" data-action="solution">Show solution</button>
+          <button class="btn ghost" data-action="reset">Reset</button>
+          <button class="btn ghost" data-action="run">▶ Run</button>
+          <button class="btn run" data-action="check">Check my code</button>
+        </div>
+      </div>
+      <textarea spellcheck="false">{{ ch.starter }}</textarea>
+      <script type="application/json" class="solution">{{ ch.solution|tojson }}</script>
+      <div class="runner-out" hidden>
+        <div class="out-head"><span>Output</span><span class="badge muted"></span></div>
+        <pre></pre>
+        <p class="explain"></p>
+      </div>
+      <div class="check-results" hidden></div>
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <nav class="pager">
+    {% if prev_topic %}<a href="{{ url_for('topic', slug=prev_topic.slug) }}">← {{ prev_topic.title }}</a>{% else %}<span></span>{% endif %}
+    {% if next_topic %}<a href="{{ url_for('topic', slug=next_topic.slug) }}">{{ next_topic.title }} →</a>{% endif %}
+  </nav>
+</article>
+{% endblock %}

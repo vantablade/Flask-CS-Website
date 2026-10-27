@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Not found{% endblock %}
+{% block content %}
+<article class="lesson">
+  <h1>404: page not found</h1>
+  <div class="runner-out static"><pre><span class="o-err">Traceback (most recent call last):
+  File "website.py", line 404, in &lt;module&gt;
+    page = find_page(url)
+LookupError: that page doesn't exist</span></pre></div>
+  <p>This is a <strong>runtime error</strong>: the request was valid, but the page couldn't be found.
+    <a href="{{ url_for('index') }}">Go back home</a>.</p>
+</article>
+{% endblock %}

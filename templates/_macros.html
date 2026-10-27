@@ -1,0 +1,17 @@
+{% macro runner(source, height=None, filename="main.py") -%}
+<div class="runner" data-runner {% if height %}data-height="{{ height }}"{% endif %}>
+  <div class="runner-bar">
+    <span class="fname">{{ filename }}</span>
+    <div class="actions">
+      <button class="btn ghost" data-action="reset" title="Restore the original code">Reset</button>
+      <button class="btn run" data-action="run" title="Run (Ctrl+Enter)">▶ Run</button>
+    </div>
+  </div>
+  <textarea spellcheck="false">{{ source }}</textarea>
+  <div class="runner-out" hidden>
+    <div class="out-head"><span>Output</span><span class="badge muted"></span></div>
+    <pre></pre>
+    <p class="explain"></p>
+  </div>
+</div>
+{%- endmacro %}

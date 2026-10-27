@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_macros.html" import runner %}
+{% block title %}Playground{% endblock %}
+{% block slug %}playground{% endblock %}
+{% block content %}
+<article class="lesson playground">
+  <h1>Code playground</h1>
+  <p class="lead">Write any Python 3 program and run it in your browser. <code>input()</code> opens a prompt box.
+    The files <code>students.csv</code> and <code>scores.txt</code> are available to read.</p>
+  <div class="pg-bar">
+    <label for="example-select">Load an example:</label>
+    <select id="example-select">
+      <option value="" selected disabled>Choose…</option>
+      {% for name in examples %}<option value="{{ name }}">{{ name }}</option>{% endfor %}
+    </select>
+    <span class="muted">Shortcut: <kbd>Ctrl</kbd>+<kbd>Enter</kbd> runs the code</span>
+  </div>
+  {{ runner(examples["Number guessing game"], height="420px") }}
+  <script type="application/json" id="examples-data">{{ examples|tojson }}</script>
+</article>
+{% endblock %}

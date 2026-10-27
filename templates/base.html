@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Paper 2 Python{% endblock %} · IGCSE CS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>window.SITE = { runnerUrl: "{{ url_for('static', filename='py/runner.py') }}" };</script>
+</head>
+<body data-slug="{% block slug %}{% endblock %}">
+  <header class="topbar">
+    <button id="nav-toggle" class="nav-toggle" aria-label="Toggle menu">☰</button>
+    <a class="brand" href="{{ url_for('index') }}"><span class="logo">&gt;_</span> Paper 2 Python</a>
+    <nav class="toplinks">
+      <a href="{{ url_for('paper2') }}">The exam</a>
+      <a href="{{ url_for('playground') }}">Playground</a>
+    </nav>
+    <div id="py-status" class="py-status" data-state="idle"><i></i><span>Python idle</span></div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="side-link {% if request.endpoint == 'paper2' %}active{% endif %}" href="{{ url_for('paper2') }}">📋 About Paper 2</a>
+      <a class="side-link {% if request.endpoint == 'playground' %}active{% endif %}" href="{{ url_for('playground') }}">🧪 Code playground</a>
+      {% for key, label in groups.items() %}
+        <div class="side-group">{{ label }}</div>
+        {% for t in all_topics if t.group == key %}
+          <a class="side-link {% if topic is defined and topic.slug == t.slug %}active{% endif %}"
+             href="{{ url_for('topic', slug=t.slug) }}">{{ t.title }}</a>
+        {% endfor %}
+      {% endfor %}
+    </aside>
+
+    <main class="content">
+      {% block content %}{% endblock %}
+      <footer class="footer">
+        Revision site for Pearson Edexcel International GCSE Computer Science (4CP0) Paper 2.
+        Spec references are a guide only. Always check the official specification and Programming Language Subset.
+        Code runs in your browser using <a href="https://pyodide.org" target="_blank" rel="noopener">Pyodide</a>.
+      </footer>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="{{ url_for('static', filename='js/site.js') }}"></script>
+</body>
+</html>

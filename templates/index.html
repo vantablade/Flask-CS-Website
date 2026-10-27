@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="eyebrow">Pearson Edexcel International GCSE · Computer Science 4CP0</div>
+  <h1>Learn Paper 2 Python by <em>running it</em>.</h1>
+  <p class="lead">Paper 2, <strong>Application of Computational Thinking</strong>, is a practical, on-screen exam in
+    Python 3. Every lesson here has code you can edit and run in your browser, plus quizzes and
+    auto-checked challenges.</p>
+  <div class="hero-actions">
+    <a class="btn run big" href="{{ url_for('topic', slug=all_topics[0].slug) }}">Start learning →</a>
+    <a class="btn ghost big" href="{{ url_for('paper2') }}">What's in the exam?</a>
+    <a class="btn ghost big" href="{{ url_for('playground') }}">Open the playground</a>
+  </div>
+</section>
+
+<section class="stats">
+  <div><b>3 h</b><span>exam length</span></div>
+  <div><b>80</b><span>marks</span></div>
+  <div><b>50%</b><span>of the IGCSE</span></div>
+  <div><b>Python 3</b><span>on-screen</span></div>
+</section>
+
+{% for key, label in groups.items()|reverse %}
+<h2 class="group-title">{{ label }}</h2>
+<div class="cards">
+  {% for t in all_topics if t.group == key %}
+  <a class="card" href="{{ url_for('topic', slug=t.slug) }}">
+    <span class="spec">Spec {{ t.spec }}</span>
+    <h3>{{ t.title }}</h3>
+    <p>{{ t.summary }}</p>
+    <span class="progress" data-progress-slug="{{ t.slug }}" hidden></span>
+  </a>
+  {% endfor %}
+</div>
+{% endfor %}
+{% endblock %}

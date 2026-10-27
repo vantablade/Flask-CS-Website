@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% from "_macros.html" import runner %}
+{% block title %}About Paper 2{% endblock %}
+{% block slug %}paper2{% endblock %}
+{% block content %}
+<article class="lesson">
+  <div class="eyebrow">4CP0/02 · Application of Computational Thinking</div>
+  <h1>About Paper 2</h1>
+  <p class="lead">A practical exam. You solve problems by writing, completing and fixing real Python programs on a computer.</p>
+
+  <section class="stats">
+    <div><b>3 hours</b><span>duration</span></div>
+    <div><b>80 marks</b><span>total</span></div>
+    <div><b>50%</b><span>of the qualification</span></div>
+    <div><b>Python 3</b><span>on-screen, no internet</span></div>
+  </section>
+
+  <section>
+    <h2>What the exam looks like</h2>
+    <p>You're given a question paper and a folder of starter files: partly written Python programs and sometimes data
+      files (such as <code>.txt</code> or <code>.csv</code>). You open them in your IDE, write or fix the code, and save
+      your work. Your saved code files are what get marked.</p>
+    <p>It mainly assesses <strong>Topic 1 (Problem solving)</strong> and <strong>Topic 2 (Programming)</strong> of the specification.
+      Typical task types:</p>
+    <table>
+      <tr><th>Task type</th><th>What you do</th><th>Practise in</th></tr>
+      <tr><td>Find and fix</td><td>Correct the syntax, runtime and logic errors in a given program</td><td><a href="{{ url_for('topic', slug='errors') }}">Errors</a></td></tr>
+      <tr><td>Complete the code</td><td>Fill in missing lines or parts of lines in a partly written program</td><td>All topics</td></tr>
+      <tr><td>Rearrange / amend</td><td>Put lines of code in the right order, or improve existing code</td><td><a href="{{ url_for('topic', slug='thinking') }}">Readable code</a></td></tr>
+      <tr><td>Write from scratch</td><td>Design and code a whole solution from a written scenario, often with validation, files, lists and subprograms</td><td><a href="{{ url_for('topic', slug='validation') }}">Validation</a>, <a href="{{ url_for('topic', slug='files') }}">Files</a></td></tr>
+      <tr><td>Algorithms</td><td>Implement or adapt a search or sort</td><td><a href="{{ url_for('topic', slug='algorithms') }}">Algorithms</a></td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>How marks are earned</h2>
+    <ul>
+      <li><strong>Functionality:</strong> does the program do what the question asks, for all inputs?</li>
+      <li><strong>Use of the right constructs:</strong> loops, selection, subprograms and data structures where they make sense.</li>
+      <li><strong>Readability and maintainability:</strong> comments, meaningful names, sensible layout. In longer programs these carry marks of their own.</li>
+      <li><strong>Robustness:</strong> validating input so the program doesn't crash on bad data.</li>
+    </ul>
+    <p>Partial solutions earn partial marks. A program that does <em>most</em> of the task scores far better than a blank file.</p>
+  </section>
+
+  <section>
+    <h2>The Programming Language Subset (PLS)</h2>
+    <p>Pearson publishes a <strong>Programming Language Subset</strong> document that lists the Python features you're
+      expected to know. Starter code in the exam uses those features, so get to know the PLS well. The essentials:</p>
+    <div class="cheats">
+      <div><h4>Basics</h4><code>print() input() int() float() str() bool() round() len() type()</code></div>
+      <div><h4>Operators</h4><code>+ - * / // % **  == != &lt; &lt;= &gt; &gt;=  and or not</code></div>
+      <div><h4>Control</h4><code>if elif else  for … in range()  while  def  return</code></div>
+      <div><h4>Lists</h4><code>append() insert() pop() remove() in  len()  list[i][j]</code></div>
+      <div><h4>Strings</h4><code>upper() lower() find() index() split() strip() isdigit() isalpha() ord() chr() [a:b]</code></div>
+      <div><h4>Files &amp; libraries</h4><code>open() read() readline() write() close() with  random math time</code></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Exam technique</h2>
+    <ol class="checklist">
+      <li><strong>Read the whole question first.</strong> Underline the inputs, the outputs and any rules (e.g. "must use a subprogram", "do not use built-in sort").</li>
+      <li><strong>Run the starter code before changing it</strong> so you know what it does now.</li>
+      <li><strong>Build in small steps.</strong> Write a few lines, run them, then continue. Don't type 50 lines and hope.</li>
+      <li><strong>Save often</strong> under the exact filename asked for.</li>
+      <li><strong>Test with normal, boundary and erroneous data</strong> and compare against what you'd expect.</li>
+      <li><strong>Match the output format</strong> in the question exactly (words, spacing, units, decimal places).</li>
+      <li><strong>Leave time to tidy up</strong>: add comments and rename unclear variables.</li>
+      <li><strong>Never leave a question blank.</strong> Comments describing your plan, or partial code, can still earn marks.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Warm-up: a typical "write a program" task</h2>
+    <p><em>A cinema charges £8 for adults and £5 for children (under 16). Write a program that asks how many tickets
+      are needed, then the age of each person, validates each age (0–120) and outputs the total cost.</em></p>
+    <p>Here's a model answer. Notice the constants, the validation loop, the comments and the clear names. Run it, then
+      try changing the prices or adding a senior discount.</p>
+    {{ runner(example) }}
+  </section>
+</article>
+{% endblock %}
