@@ -15,6 +15,8 @@ OUTPUT_LIMIT = 200_000    # characters
 SEED_FILES = {
     "students.csv": "Amira,72\nBen,58\nChen,91\nDara,64\nEli,85\n",
     "scores.txt": "12\n45\n33\n27\n",
+    "products.csv": "P01,Pencil,120,50\nP02,Ruler,30,40\nP03,Eraser,15,25\nP04,Notebook,200,60\nP05,Glue stick,8,20\n",
+    "rainfall.txt": "Jan,78\nFeb,61\nMar,55\nApr,49\nMay,52\nJun,40\nJul,35\nAug,48\nSep,57\nOct,83\nNov,90\nDec,85\n",
 }
 
 _state = {"start": 0.0, "events": 0, "chars": 0}

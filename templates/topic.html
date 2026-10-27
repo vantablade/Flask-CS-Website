@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import runner %}
+{% from "_macros.html" import runner, challenge_block, exam_question, question_card with context %}
 {% block title %}{{ topic.title }}{% endblock %}
 {% block slug %}{{ topic.slug }}{% endblock %}
 {% block content %}
@@ -13,7 +13,8 @@
     <ol>
       {% for s in topic.sections %}<li><a href="#s{{ loop.index }}">{{ s.heading }}</a></li>{% endfor %}
       {% if topic.quiz %}<li><a href="#quiz">Quick quiz</a></li>{% endif %}
-      {% if topic.challenges %}<li><a href="#challenges">Coding challenge{{ 's' if topic.challenges|length > 1 }}</a></li>{% endif %}
+      {% if topic.challenges %}<li><a href="#practice">Practice problems ({{ topic.challenges|length }})</a></li>{% endif %}
+      {% if inline_questions or related_questions %}<li><a href="#exam">Exam-style questions</a></li>{% endif %}
     </ol>
   </nav>
 
@@ -44,34 +45,29 @@
   {% endif %}
 
   {% if topic.challenges %}
-  <section id="challenges">
-    <h2>Coding challenge{{ 's' if topic.challenges|length > 1 }}</h2>
+  <section id="practice">
+    <h2>Practice problems</h2>
+    <p class="muted">Write the code, then press <strong>Check my code</strong> to run it against test data.</p>
     {% for ch in topic.challenges %}
-    <div class="challenge runner" data-runner data-challenge="{{ loop.index0 }}" data-tests='{{ ch.tests|tojson }}'>
-      <div class="ch-head">
-        <h3>{{ ch.title }} <span class="solved-tag">✓ Solved</span></h3>
+      {% call challenge_block(ch, loop.index0, "practice_" ~ loop.index ~ ".py") %}
+        <h3><span class="pnum">{{ loop.index }}</span> {{ ch.title }} <span class="solved-tag">✓ Solved</span></h3>
         <p>{{ ch.task|safe }}</p>
         <details><summary>Hint</summary><p>{{ ch.hint }}</p></details>
-      </div>
-      <div class="runner-bar">
-        <span class="fname">challenge.py</span>
-        <div class="actions">
-          <button class="btn ghost" data-action="solution">Show solution</button>
-          <button class="btn ghost" data-action="reset">Reset</button>
-          <button class="btn ghost" data-action="run">▶ Run</button>
-          <button class="btn run" data-action="check">Check my code</button>
-        </div>
-      </div>
-      <textarea spellcheck="false">{{ ch.starter }}</textarea>
-      <script type="application/json" class="solution">{{ ch.solution|tojson }}</script>
-      <div class="runner-out" hidden>
-        <div class="out-head"><span>Output</span><span class="badge muted"></span></div>
-        <pre></pre>
-        <p class="explain"></p>
-      </div>
-      <div class="check-results" hidden></div>
-    </div>
+      {% endcall %}
     {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if inline_questions or related_questions %}
+  <section id="exam">
+    <h2>Exam-style questions</h2>
+    <p class="muted">Questions written in the style of Paper 2, with the marks shown. Pass the tests, then use the mark
+      scheme to mark yourself. <a href="{{ url_for('exam_library') }}">See the full library →</a></p>
+    {% for q in inline_questions %}{{ exam_question(q, inline=True) }}{% endfor %}
+    {% if related_questions %}
+    <h3 class="sub">More questions that use this topic</h3>
+    <div class="qcards">{% for q in related_questions %}{{ question_card(q) }}{% endfor %}</div>
+    {% endif %}
   </section>
   {% endif %}
 

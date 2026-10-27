@@ -1787,6 +1787,335 @@ question, add a comment for each section and rename any single-letter variables 
 ]
 
 
+# Extra practice problems, appended to each topic's challenges below.
+# A test can also list "reject" substrings that must NOT appear, and a "label".
+EXTRA_CHALLENGES = {
+    "basics": [
+        {"title": "Temperature converter",
+         "task": "Ask for a temperature in Celsius (it may have a decimal part) and output it in Fahrenheit in the form "
+                 "<code>Fahrenheit: 212.0</code>. Use <code>F = C × 9 / 5 + 32</code>.",
+         "starter": code(r'''
+celsius = float(input("Celsius: "))
+'''),
+         "solution": code(r'''
+celsius = float(input("Celsius: "))
+fahrenheit = celsius * 9 / 5 + 32
+print("Fahrenheit:", fahrenheit)
+'''),
+         "hint": "Calculate fahrenheit from celsius, then print(\"Fahrenheit:\", fahrenheit).",
+         "tests": [{"inputs": ["100"], "expect": ["Fahrenheit: 212"]},
+                   {"inputs": ["0"], "expect": ["Fahrenheit: 32"]},
+                   {"inputs": ["-40"], "expect": ["Fahrenheit: -40"]},
+                   {"inputs": ["37.5"], "expect": ["Fahrenheit: 99.5"]}]},
+    ],
+    "operators": [
+        {"title": "Digit sum",
+         "task": "Ask for a 3-digit whole number and output the sum of its digits, e.g. 472 gives <code>Digit sum: 13</code>. "
+                 "Use <code>//</code> and <code>%</code>, not string slicing.",
+         "starter": code(r'''
+number = int(input("Enter a 3-digit number: "))
+'''),
+         "solution": code(r'''
+number = int(input("Enter a 3-digit number: "))
+hundreds = number // 100
+tens = number // 10 % 10
+units = number % 10
+print("Digit sum:", hundreds + tens + units)
+'''),
+         "hint": "number % 10 is the units digit, number // 10 % 10 is the tens digit, and number // 100 is the hundreds.",
+         "tests": [{"inputs": ["472"], "expect": ["Digit sum: 13"]},
+                   {"inputs": ["100"], "expect": ["Digit sum: 1"]},
+                   {"inputs": ["999"], "expect": ["Digit sum: 27"]}]},
+    ],
+    "selection": [
+        {"title": "Leap year",
+         "task": "Ask for a year and output <code>Leap year</code> or <code>Not a leap year</code>. A year is a leap year if it is "
+                 "divisible by 4 but not by 100, <em>or</em> if it is divisible by 400.",
+         "starter": code(r'''
+year = int(input("Enter a year: "))
+'''),
+         "solution": code(r'''
+year = int(input("Enter a year: "))
+if (year % 4 == 0 and year % 100 != 0) or year % 400 == 0:
+    print("Leap year")
+else:
+    print("Not a leap year")
+'''),
+         "hint": "Combine the conditions with and / or, and use brackets to make the grouping clear.",
+         "tests": [{"inputs": ["2024"], "expect": ["Leap year"], "reject": ["Not"]},
+                   {"inputs": ["2023"], "expect": ["Not a leap year"]},
+                   {"inputs": ["1900"], "expect": ["Not a leap year"], "label": "Divisible by 100"},
+                   {"inputs": ["2000"], "expect": ["Leap year"], "reject": ["Not"], "label": "Divisible by 400"}]},
+    ],
+    "iteration": [
+        {"title": "FizzBuzz",
+         "task": "Ask for a number <code>n</code>, then print each number from 1 to n on its own line. Print <code>Fizz</code> instead "
+                 "for multiples of 3, <code>Buzz</code> for multiples of 5, and <code>FizzBuzz</code> for multiples of both.",
+         "starter": code(r'''
+n = int(input("Enter n: "))
+'''),
+         "solution": code(r'''
+n = int(input("Enter n: "))
+for i in range(1, n + 1):
+    if i % 15 == 0:
+        print("FizzBuzz")
+    elif i % 3 == 0:
+        print("Fizz")
+    elif i % 5 == 0:
+        print("Buzz")
+    else:
+        print(i)
+'''),
+         "hint": "Check for multiples of 15 first, otherwise the Fizz branch catches 15 before FizzBuzz can.",
+         "tests": [{"inputs": ["15"], "expect": ["1\n2\nFizz\n4\nBuzz\nFizz", "13\n14\nFizzBuzz"]},
+                   {"inputs": ["5"], "expect": ["1\n2\nFizz\n4\nBuzz"], "reject": ["FizzBuzz"]}]},
+    ],
+    "lists": [
+        {"title": "Above average",
+         "task": "Ask for 5 whole-number scores and store them in a list. Then output how many scores are above the mean, "
+                 "e.g. <code>Above average: 3</code>.",
+         "starter": code(r'''
+scores = []
+'''),
+         "solution": code(r'''
+scores = []
+for i in range(5):
+    scores.append(int(input("Enter score: ")))
+
+mean = sum(scores) / len(scores)
+count = 0
+for score in scores:
+    if score > mean:
+        count = count + 1
+print("Above average:", count)
+'''),
+         "hint": "Fill the list in one loop, calculate the mean, then count in a second loop.",
+         "tests": [{"inputs": ["45", "78", "92", "61", "88"], "expect": ["Above average: 3"]},
+                   {"inputs": ["10", "10", "10", "10", "10"], "expect": ["Above average: 0"], "label": "All equal"},
+                   {"inputs": ["0", "0", "0", "0", "100"], "expect": ["Above average: 1"]}]},
+    ],
+    "strings": [
+        {"title": "Palindrome checker",
+         "task": "Ask for a word or phrase and output <code>Palindrome</code> if it reads the same backwards, or "
+                 "<code>Not a palindrome</code>. Ignore upper/lower case and spaces.",
+         "starter": code(r'''
+text = input("Enter a word or phrase: ")
+'''),
+         "solution": code(r'''
+text = input("Enter a word or phrase: ")
+cleaned = text.lower().replace(" ", "")
+if cleaned == cleaned[::-1]:
+    print("Palindrome")
+else:
+    print("Not a palindrome")
+'''),
+         "hint": "Use lower() and replace(\" \", \"\") to clean the text, then compare it with its reverse, [::-1].",
+         "tests": [{"inputs": ["Racecar"], "expect": ["Palindrome"], "reject": ["Not"]},
+                   {"inputs": ["Never odd or even"], "expect": ["Palindrome"], "reject": ["Not"]},
+                   {"inputs": ["hello"], "expect": ["Not a palindrome"]}]},
+    ],
+    "subprograms": [
+        {"title": "Prime number function",
+         "task": "Complete the function <code>is_prime(n)</code> so it <strong>returns</strong> <code>True</code> if n is a prime "
+                 "number and <code>False</code> otherwise. 1 is not prime.",
+         "starter": code(r'''
+def is_prime(n):
+    # return True if n is prime, otherwise False
+    return False
+
+
+number = int(input("Enter a whole number: "))
+if is_prime(number):
+    print("Prime")
+else:
+    print("Not prime")
+'''),
+         "solution": code(r'''
+def is_prime(n):
+    if n < 2:
+        return False
+    for divisor in range(2, n):
+        if n % divisor == 0:
+            return False
+    return True
+
+
+number = int(input("Enter a whole number: "))
+if is_prime(number):
+    print("Prime")
+else:
+    print("Not prime")
+'''),
+         "hint": "Return False as soon as you find a number from 2 to n - 1 that divides n exactly.",
+         "tests": [{"inputs": ["7"], "expect": ["Prime"], "reject": ["Not"]},
+                   {"inputs": ["2"], "expect": ["Prime"], "reject": ["Not"], "label": "Boundary"},
+                   {"inputs": ["1"], "expect": ["Not prime"], "label": "Boundary"},
+                   {"inputs": ["9"], "expect": ["Not prime"]},
+                   {"inputs": ["97"], "expect": ["Prime"], "reject": ["Not"]}]},
+    ],
+    "files": [
+        {"title": "Top scorer",
+         "task": "Read <code>students.csv</code> and output the student with the highest score in the form "
+                 "<code>Top: Chen 91</code>. Don't use <code>max()</code>.",
+         "starter": code(r'''
+best_name = ""
+best_score = -1
+'''),
+         "solution": code(r'''
+best_name = ""
+best_score = -1
+with open("students.csv", "r") as file:
+    for line in file:
+        fields = line.strip().split(",")
+        score = int(fields[1])
+        if score > best_score:
+            best_score = score
+            best_name = fields[0]
+print("Top:", best_name, best_score)
+'''),
+         "hint": "Loop over the lines, split each one, and update best_name and best_score whenever you find a higher score.",
+         "tests": [{"inputs": [], "expect": ["Top: Chen 91"]}]},
+    ],
+    "validation": [
+        {"title": "Password rules",
+         "task": "Keep asking the user to choose a password until it is <strong>at least 8 characters</strong> and contains "
+                 "<strong>at least one digit</strong>. Then output <code>Password accepted</code>.",
+         "starter": code(r'''
+password = input("Choose a password: ")
+'''),
+         "solution": code(r'''
+def contains_digit(text):
+    for character in text:
+        if character.isdigit():
+            return True
+    return False
+
+
+password = input("Choose a password: ")
+while len(password) < 8 or not contains_digit(password):
+    print("Password must be at least 8 characters and contain a digit")
+    password = input("Choose a password: ")
+print("Password accepted")
+'''),
+         "hint": "Write a small function that loops through the characters and returns True if any of them isdigit().",
+         "tests": [{"inputs": ["short", "longpassword", "longpass1"], "expect": ["Password accepted"]},
+                   {"inputs": ["abcdefg1"], "expect": ["Password accepted"], "label": "Boundary: exactly 8"},
+                   {"inputs": ["abc1", "12345678"], "expect": ["Password accepted"]}]},
+    ],
+    "errors": [
+        {"title": "Fix the times table",
+         "task": "This program should print the times table for a number from <code>1 x 7 = 7</code> up to "
+                 "<code>12 x 7 = 84</code>. It has one runtime error and two logic errors. Fix them.",
+         "starter": code(r'''
+# Print the times table for a number, from 1 up to 12
+number = input("Which times table? ")
+for i in range(1, 12):
+    print(i, "x", number, "=", i + number)
+'''),
+         "solution": code(r'''
+# Print the times table for a number, from 1 up to 12
+number = int(input("Which times table? "))   # runtime: convert to int
+for i in range(1, 13):                        # logic: include 12
+    print(i, "x", number, "=", i * number)    # logic: multiply, not add
+'''),
+         "hint": "Run it first and read the error. Then check the last line printed and the arithmetic.",
+         "tests": [{"inputs": ["7"], "expect": ["1 x 7 = 7", "12 x 7 = 84"]},
+                   {"inputs": ["3"], "expect": ["5 x 3 = 15", "12 x 3 = 36"]}]},
+    ],
+    "testing": [
+        {"title": "Age groups: pass every test",
+         "task": "Ask for an age and output <code>Child</code> (0–12), <code>Teen</code> (13–19), <code>Adult</code> (20 or over) or "
+                 "<code>Invalid</code> for anything that isn't a whole number of 0 or more. The checker uses normal, "
+                 "<strong>boundary</strong> and <strong>erroneous</strong> test data, just like a test plan.",
+         "starter": code(r'''
+age = input("Enter age: ")
+'''),
+         "solution": code(r'''
+age = input("Enter age: ")
+if not age.isdigit():
+    print("Invalid")
+elif int(age) <= 12:
+    print("Child")
+elif int(age) <= 19:
+    print("Teen")
+else:
+    print("Adult")
+'''),
+         "hint": "Check the input is all digits before converting it. Negative numbers and text both fail isdigit().",
+         "tests": [{"inputs": ["8"], "expect": ["Child"], "label": "Normal"},
+                   {"inputs": ["12"], "expect": ["Child"], "label": "Boundary"},
+                   {"inputs": ["13"], "expect": ["Teen"], "label": "Boundary"},
+                   {"inputs": ["19"], "expect": ["Teen"], "label": "Boundary"},
+                   {"inputs": ["20"], "expect": ["Adult"], "label": "Boundary"},
+                   {"inputs": ["0"], "expect": ["Child"], "label": "Boundary"},
+                   {"inputs": ["-1"], "expect": ["Invalid"], "label": "Erroneous"},
+                   {"inputs": ["abc"], "expect": ["Invalid"], "label": "Erroneous"}]},
+    ],
+    "algorithms": [
+        {"title": "Descending bubble sort",
+         "task": "Use a bubble sort (not <code>sort()</code> or <code>sorted()</code>) to sort <code>numbers</code> into "
+                 "<strong>descending</strong> order, then print the list.",
+         "starter": code(r'''
+numbers = [3, 9, 1, 7, 5]
+# sort into descending order using a bubble sort
+
+print(numbers)
+'''),
+         "solution": code(r'''
+numbers = [3, 9, 1, 7, 5]
+swapped = True
+while swapped:
+    swapped = False
+    for i in range(len(numbers) - 1):
+        if numbers[i] < numbers[i + 1]:   # < instead of > for descending
+            temp = numbers[i]
+            numbers[i] = numbers[i + 1]
+            numbers[i + 1] = temp
+            swapped = True
+print(numbers)
+'''),
+         "hint": "It's the same bubble sort as ascending, but swap when the left item is smaller than the right.",
+         "tests": [{"inputs": [], "expect": ["[9, 7, 5, 3, 1]"]}]},
+    ],
+    "thinking": [
+        {"title": "Shopping receipt",
+         "task": "Keep asking for item prices until <code>0</code> is entered. If the total is <strong>over £50</strong>, take off 10%. "
+                 "Output <code>Total: £54.00</code> (2 decimal places). Decompose it: use a function for the discount.",
+         "starter": code(r'''
+# Shopping receipt
+'''),
+         "solution": code(r'''
+# Shopping receipt
+DISCOUNT_THRESHOLD = 50
+DISCOUNT_RATE = 0.1
+
+
+def apply_discount(total):
+    """Return the total after any discount."""
+    if total > DISCOUNT_THRESHOLD:
+        return total * (1 - DISCOUNT_RATE)
+    return total
+
+
+total = 0
+price = float(input("Item price (0 to finish): "))
+while price != 0:
+    total = total + price
+    price = float(input("Item price (0 to finish): "))
+
+print(f"Total: £{apply_discount(total):.2f}")
+'''),
+         "hint": "One loop collects the prices, a function applies the discount, and an f-string formats the result.",
+         "tests": [{"inputs": ["20", "40", "0"], "expect": ["Total: £54.00"]},
+                   {"inputs": ["10", "5", "0"], "expect": ["Total: £15.00"]},
+                   {"inputs": ["50", "0"], "expect": ["Total: £50.00"], "label": "Boundary: exactly £50"}]},
+    ],
+}
+
+for _topic in TOPICS:
+    _topic["challenges"].extend(EXTRA_CHALLENGES.get(_topic["slug"], []))
+
+
 PAPER2_EXAMPLE = code(r'''
 # Cinema ticket calculator
 ADULT_PRICE = 8

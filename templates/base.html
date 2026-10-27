@@ -17,6 +17,7 @@
     <a class="brand" href="{{ url_for('index') }}"><span class="logo">&gt;_</span> Paper 2 Python</a>
     <nav class="toplinks">
       <a href="{{ url_for('paper2') }}">The exam</a>
+      <a href="{{ url_for('exam_library') }}">Exam questions</a>
       <a href="{{ url_for('playground') }}">Playground</a>
     </nav>
     <div id="py-status" class="py-status" data-state="idle"><i></i><span>Python idle</span></div>
@@ -25,6 +26,7 @@
   <div class="layout">
     <aside class="sidebar">
       <a class="side-link {% if request.endpoint == 'paper2' %}active{% endif %}" href="{{ url_for('paper2') }}">📋 About Paper 2</a>
+      <a class="side-link {% if request.endpoint in ('exam_library', 'exam_question') %}active{% endif %}" href="{{ url_for('exam_library') }}">📝 Exam questions <span class="count">{{ question_count }}</span></a>
       <a class="side-link {% if request.endpoint == 'playground' %}active{% endif %}" href="{{ url_for('playground') }}">🧪 Code playground</a>
       {% for key, label in groups.items() %}
         <div class="side-group">{{ label }}</div>

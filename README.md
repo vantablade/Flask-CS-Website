@@ -17,6 +17,9 @@ Then open http://127.0.0.1:5000.
 - `app.py`: Flask routes (home, `/paper-2`, `/playground`, `/topic/<slug>`).
 - `content.py`: **all lesson content**: topics, sections, code examples, quizzes and challenges with tests.
   To add a topic, add a dict to `TOPICS`.
+- `exam_questions.py`: the exam-style question library (amend, fix, complete, rearrange, write, and extended
+  15–20 mark programs). Each question has tests, a model answer and a mark scheme. A question with `lesson` set also
+  appears inside that lesson. These are original questions, not Pearson past-paper questions.
 - `static/py/runner.py`: loaded into [Pyodide](https://pyodide.org) (Python compiled to WebAssembly) in the browser.
   It runs student code, sends `input()` to a browser prompt, labels errors as syntax or runtime, and stops
   infinite loops after 5 seconds. Student code never runs on the server.

@@ -15,3 +15,84 @@
   </div>
 </div>
 {%- endmacro %}
+
+
+{# Editor + run / check / solution buttons. The caller block supplies the task text. #}
+{% macro challenge_block(ch, key, filename="challenge.py", progress_slug="", solution_label="Show solution") -%}
+<div class="challenge runner" data-runner data-challenge="{{ key }}"
+     {% if progress_slug %}data-progress-slug="{{ progress_slug }}"{% endif %}
+     data-tests='{{ ch.tests|tojson }}'>
+  <div class="ch-head">{{ caller() }}</div>
+  <div class="runner-bar">
+    <span class="fname">{{ filename }}</span>
+    <div class="actions">
+      <button class="btn ghost" data-action="solution">{{ solution_label }}</button>
+      <button class="btn ghost" data-action="reset">Reset</button>
+      <button class="btn ghost" data-action="run">▶ Run</button>
+      <button class="btn run" data-action="check">Check my code</button>
+    </div>
+  </div>
+  <textarea spellcheck="false">{{ ch.starter }}</textarea>
+  <script type="application/json" class="solution">{{ ch.solution|tojson }}</script>
+  <div class="runner-out" hidden>
+    <div class="out-head"><span>Output</span><span class="badge muted"></span></div>
+    <pre></pre>
+    <p class="explain"></p>
+  </div>
+  <div class="check-results" hidden></div>
+</div>
+{%- endmacro %}
+
+
+{% macro qmeta(q) -%}
+<span class="qtype t-{{ q.type }}">{{ question_types[q.type] }}</span>
+<span class="qmarks">{{ q.marks }} mark{{ 's' if q.marks != 1 }}</span>
+{%- endmacro %}
+
+
+{% macro exam_question(q, inline=False) -%}
+<div class="examq" id="q-{{ q.id }}">
+  <div class="examq-top">
+    <span class="qnum">Q{{ '%02d' % q.number }}</span>
+    {{ qmeta(q) }}
+    {% if inline %}<a class="qlink" href="{{ url_for('exam_question', qid=q.id) }}">Open in library ↗</a>{% endif %}
+  </div>
+  {% call challenge_block(q, q.id, q.filename, "exam", "Model answer") %}
+    <h3>{{ q.title }} <span class="solved-tag">✓ Tests passed</span></h3>
+    {{ q.scenario|safe }}
+    {% if q.files %}
+    <p class="datafiles">Data file{{ 's' if q.files|length > 1 }}:
+      {% for f in q.files %}<code>{{ f }}</code>{% if not loop.last %}, {% endif %}{% endfor %}
+      (already on this site's virtual disk)</p>
+    {% endif %}
+    {% if q.hint %}<details><summary>Hint</summary><p>{{ q.hint }}</p></details>{% endif %}
+  {% endcall %}
+  <details class="markscheme" data-qid="{{ q.id }}" data-total="{{ q.marks }}">
+    <summary>Mark scheme &amp; self-marking <span class="ms-score"></span></summary>
+    <p class="muted">The tests above check that your program <em>works</em>. Exam marks also depend on <em>how</em> it's written.
+      Tick each point your code meets honestly. Your mark is saved on this device. (This mark scheme was written for this
+      site and isn't an official Pearson mark scheme.)</p>
+    {% for group in q.mark_scheme %}
+    <h4>{{ group.group }}</h4>
+    <ul class="ms-points">
+      {% for marks, text in group.points %}
+      <li><label><input type="checkbox" data-marks="{{ marks }}"> <span class="ms-m">{{ marks }}</span> {{ text }}</label></li>
+      {% endfor %}
+    </ul>
+    {% endfor %}
+    <div class="ms-total">Your mark: <b class="ms-now">0</b> / {{ q.marks }}
+      <button class="btn ghost" data-action="ms-clear">Clear</button></div>
+  </details>
+</div>
+{%- endmacro %}
+
+
+{% macro question_card(q) -%}
+<a class="qcard" href="{{ url_for('exam_question', qid=q.id) }}" data-qid="{{ q.id }}"
+   data-type="{{ q.type }}" data-topics="{{ q.topics|join(' ') }}" data-marks="{{ q.marks }}">
+  <div class="qcard-top"><span class="qnum">Q{{ '%02d' % q.number }}</span>{{ qmeta(q) }}</div>
+  <h3>{{ q.title }}</h3>
+  <p class="qtopics">{% for t in q.topics %}{{ topic_titles[t] }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+  <span class="qstatus" hidden></span>
+</a>
+{%- endmacro %}

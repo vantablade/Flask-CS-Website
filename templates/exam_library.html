@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_macros.html" import question_card with context %}
+{% block title %}Exam questions{% endblock %}
+{% block slug %}exam{% endblock %}
+{% block content %}
+<article class="lesson wide">
+  <div class="eyebrow">Paper 2 practice</div>
+  <h1>Exam question library</h1>
+  <p class="lead">{{ questions|length }} exam-style questions worth {{ total_marks }} marks in total. They range from 2-mark
+    "amend the code" tasks to full 20-mark programs. Every question runs in your browser, with auto-checked tests, a model
+    answer and a self-marking mark scheme.</p>
+  <p class="callout">These are original questions written in the style of Paper 2. They aren't Pearson past-paper questions,
+    and the mark schemes aren't official. For real past papers and mark schemes, see Pearson's website.</p>
+
+  <div class="filters">
+    <div class="fgroup" data-filter="type">
+      <span>Type</span>
+      <button class="chip on" data-value="">All</button>
+      {% for key, label in question_types.items() %}<button class="chip" data-value="{{ key }}">{{ label }}</button>{% endfor %}
+    </div>
+    <div class="fgroup" data-filter="marks">
+      <span>Marks</span>
+      <button class="chip on" data-value="">All</button>
+      <button class="chip" data-value="1-4">1–4</button>
+      <button class="chip" data-value="5-8">5–8</button>
+      <button class="chip" data-value="9-14">9–14</button>
+      <button class="chip" data-value="15-20">15–20</button>
+    </div>
+    <div class="fgroup">
+      <span>Topic</span>
+      <select id="topic-filter">
+        <option value="">All topics</option>
+        {% for t in all_topics %}<option value="{{ t.slug }}">{{ t.title }}</option>{% endfor %}
+      </select>
+    </div>
+  </div>
+  <p class="muted" id="library-summary"></p>
+
+  <div class="qcards" id="question-list">
+    {% for q in questions %}{{ question_card(q) }}{% endfor %}
+  </div>
+  <p class="muted" id="no-results" hidden>No questions match those filters.</p>
+</article>
+{% endblock %}

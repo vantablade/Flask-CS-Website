@@ -9,6 +9,7 @@
     auto-checked challenges.</p>
   <div class="hero-actions">
     <a class="btn run big" href="{{ url_for('topic', slug=all_topics[0].slug) }}">Start learning →</a>
+    <a class="btn ghost big" href="{{ url_for('exam_library') }}">Exam question library</a>
     <a class="btn ghost big" href="{{ url_for('paper2') }}">What's in the exam?</a>
     <a class="btn ghost big" href="{{ url_for('playground') }}">Open the playground</a>
   </div>
@@ -21,6 +22,15 @@
   <div><b>Python 3</b><span>on-screen</span></div>
 </section>
 
+<a class="feature" href="{{ url_for('exam_library') }}">
+  <div>
+    <h2>📝 Exam question library</h2>
+    <p>{{ question_count }} exam-style questions, from 2-mark "amend the code" tasks to full 20-mark programs. Each has tests,
+      a model answer and a self-marking mark scheme. Several also appear inside the lessons as you learn.</p>
+  </div>
+  <span class="btn run">Browse questions →</span>
+</a>
+
 {% for key, label in groups.items()|reverse %}
 <h2 class="group-title">{{ label }}</h2>
 <div class="cards">
@@ -29,7 +39,7 @@
     <span class="spec">Spec {{ t.spec }}</span>
     <h3>{{ t.title }}</h3>
     <p>{{ t.summary }}</p>
-    <span class="progress" data-progress-slug="{{ t.slug }}" hidden></span>
+    <span class="progress" data-topic-progress="{{ t.slug }}" hidden></span>
   </a>
   {% endfor %}
 </div>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_macros.html" import exam_question with context %}
+{% block title %}Q{{ '%02d' % q.number }} {{ q.title }}{% endblock %}
+{% block slug %}exam{% endblock %}
+{% block content %}
+<article class="lesson">
+  <a class="back" href="{{ url_for('exam_library') }}">← Exam question library</a>
+  <h1>{{ q.title }}</h1>
+  <p class="lead">Topics:
+    {% for t in q.topics %}<a href="{{ url_for('topic', slug=t) }}">{{ topic_titles[t] }}</a>{% if not loop.last %} · {% endif %}{% endfor %}
+  </p>
+  {% if q.marks >= 15 %}
+  <p class="callout">An extended question. In the exam, give yourself about <strong>{{ (q.marks * 2.25)|round|int }} minutes</strong>
+    (3 hours ÷ 80 marks ≈ 2¼ minutes per mark). Plan first: list the inputs, processes and outputs, and decide which
+    subprograms you need.</p>
+  {% endif %}
+  {{ exam_question(q) }}
+  <nav class="pager">
+    {% if prev_q %}<a href="{{ url_for('exam_question', qid=prev_q.id) }}">← Q{{ '%02d' % prev_q.number }} {{ prev_q.title }}</a>{% else %}<span></span>{% endif %}
+    {% if next_q %}<a href="{{ url_for('exam_question', qid=next_q.id) }}">Q{{ '%02d' % next_q.number }} {{ next_q.title }} →</a>{% endif %}
+  </nav>
+</article>
+{% endblock %}

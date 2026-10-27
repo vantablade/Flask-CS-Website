@@ -217,11 +217,11 @@
     const solution = JSON.parse(el.querySelector("script.solution").textContent);
     const results = el.querySelector(".check-results");
     const checkBtn = el.querySelector("[data-action=check]");
-    const slug = document.body.dataset.slug;
+    const slug = el.dataset.progressSlug || document.body.dataset.slug;
     const id = el.dataset.challenge;
 
     el.querySelector("[data-action=solution]").addEventListener("click", () => {
-      if (confirm("Replace your code with the model solution? Try it yourself first!")) editor.setValue(solution);
+      if (confirm("Replace your code with the model answer? Have a proper go yourself first!")) editor.setValue(solution);
     });
 
     checkBtn.addEventListener("click", async () => {
@@ -238,7 +238,8 @@
           const scratch = document.createElement("pre");
           const r = await runPython(editor.getValue(), scratch, t.inputs);
           const out = r.output.toLowerCase();
-          const ok = r.status === "ok" && t.expect.every((e) => out.includes(e.toLowerCase()));
+          const ok = r.status === "ok" && t.expect.every((e) => out.includes(e.toLowerCase())) &&
+            !(t.reject || []).some((e) => out.includes(e.toLowerCase()));
           if (ok) passed++;
           rows.push({ t, ok, r, scratch });
           if (r.status.startsWith("syntax")) break;   // no point running the rest
@@ -254,8 +255,11 @@
         (all ? "🎉 All " + tests.length + " tests passed!" : passed + " of " + tests.length + " tests passed") + "</strong></p><ol>";
       rows.forEach(({ t, ok, r, scratch }) => {
         const inputs = t.inputs.length ? "inputs " + t.inputs.map((v) => "<code>" + escapeHtml(JSON.stringify(v)) + "</code>").join(", ") : "no input";
-        html += '<li class="' + (ok ? "pass" : "fail") + '">' + (ok ? "✓ " : "✗ ") + inputs +
-          ": expected output containing " + t.expect.map((e) => "<code>" + escapeHtml(e) + "</code>").join(" and ");
+        const show = (list) => list.map((e) => "<code>" + escapeHtml(e).replace(/\n/g, "↵") + "</code>").join(" and ");
+        html += '<li class="' + (ok ? "pass" : "fail") + '">' + (ok ? "✓ " : "✗ ") +
+          (t.label ? '<span class="tlabel">' + escapeHtml(t.label) + "</span> " : "") + inputs +
+          ": expected output containing " + show(t.expect) +
+          (t.reject && t.reject.length ? ", and not " + show(t.reject) : "");
         if (!ok) {
           const d = describeStatus(r.status);
           if (r.status !== "ok") html += ' <span class="badge ' + d.cls + '">' + escapeHtml(d.label) + "</span>";
@@ -320,15 +324,100 @@
     });
   }
 
+  // ------------------------------------------------------ mark schemes
+  function initMarkScheme(box) {
+    const qid = box.dataset.qid;
+    const total = Number(box.dataset.total);
+    const boxes = Array.from(box.querySelectorAll("input[type=checkbox]"));
+    const nowEl = box.querySelector(".ms-now");
+    const summaryScore = box.querySelector(".ms-score");
+    const saved = ((loadProgress().exam || {}).ticks || {})[qid] || [];
+    boxes.forEach((b, i) => { b.checked = saved.includes(i); });
+
+    function update(save) {
+      const mark = boxes.reduce((sum, b) => sum + (b.checked ? Number(b.dataset.marks) : 0), 0);
+      nowEl.textContent = mark;
+      summaryScore.textContent = boxes.some((b) => b.checked) ? "· " + mark + " / " + total : "";
+      if (!save) return;
+      const exam = loadProgress().exam || {};
+      exam.ticks = exam.ticks || {};
+      exam.marks = exam.marks || {};
+      exam.ticks[qid] = boxes.map((b, i) => (b.checked ? i : -1)).filter((i) => i >= 0);
+      exam.marks[qid] = mark;
+      recordProgress("exam", "ticks", exam.ticks);
+      recordProgress("exam", "marks", exam.marks);
+    }
+    boxes.forEach((b) => b.addEventListener("change", () => update(true)));
+    box.querySelector("[data-action=ms-clear]").addEventListener("click", () => {
+      boxes.forEach((b) => { b.checked = false; });
+      update(true);
+    });
+    update(false);
+  }
+
+  // ------------------------------------------------- question library
+  function showQuestionStatus() {
+    const exam = loadProgress().exam || {};
+    const solved = exam.challenges || [];
+    const marks = exam.marks || {};
+    document.querySelectorAll(".qcard").forEach((card) => {
+      const qid = card.dataset.qid;
+      const bits = [];
+      if (solved.includes(qid)) bits.push("✓ Tests passed");
+      if (marks[qid] !== undefined && marks[qid] > 0) bits.push("Self-marked " + marks[qid] + "/" + card.dataset.marks);
+      const el = card.querySelector(".qstatus");
+      if (bits.length) { el.textContent = bits.join(" · "); el.hidden = false; card.classList.add("attempted"); }
+    });
+    const summary = document.getElementById("library-summary");
+    if (summary) {
+      const cards = document.querySelectorAll(".qcard");
+      const done = Array.from(cards).filter((c) => solved.includes(c.dataset.qid)).length;
+      let got = 0, possible = 0;
+      cards.forEach((c) => {
+        if (marks[c.dataset.qid] !== undefined) { got += marks[c.dataset.qid]; possible += Number(c.dataset.marks); }
+      });
+      summary.textContent = "Tests passed on " + done + " of " + cards.length + " questions" +
+        (possible ? " · self-marked " + got + " / " + possible + " marks on the questions you've marked" : "");
+    }
+  }
+
+  function initLibrary() {
+    const list = document.getElementById("question-list");
+    if (!list) return;
+    const state = { type: "", marks: "", topic: "" };
+    const apply = () => {
+      let shown = 0;
+      list.querySelectorAll(".qcard").forEach((card) => {
+        const m = Number(card.dataset.marks);
+        const [lo, hi] = state.marks ? state.marks.split("-").map(Number) : [0, 999];
+        const ok = (!state.type || card.dataset.type === state.type) &&
+          m >= lo && m <= hi &&
+          (!state.topic || card.dataset.topics.split(" ").includes(state.topic));
+        card.hidden = !ok;
+        if (ok) shown++;
+      });
+      document.getElementById("no-results").hidden = shown > 0;
+    };
+    document.querySelectorAll(".fgroup[data-filter]").forEach((group) => {
+      group.querySelectorAll(".chip").forEach((chip) => chip.addEventListener("click", () => {
+        group.querySelectorAll(".chip").forEach((c) => c.classList.remove("on"));
+        chip.classList.add("on");
+        state[group.dataset.filter] = chip.dataset.value;
+        apply();
+      }));
+    });
+    document.getElementById("topic-filter").addEventListener("change", (e) => { state.topic = e.target.value; apply(); });
+  }
+
   // ------------------------------------------------------- index progress
   function showProgress() {
     const p = loadProgress();
-    document.querySelectorAll("[data-progress-slug]").forEach((el) => {
-      const t = p[el.dataset.progressSlug];
+    document.querySelectorAll("[data-topic-progress]").forEach((el) => {
+      const t = p[el.dataset.topicProgress];
       if (!t) return;
       const bits = [];
       if (t.quizTotal) bits.push("Quiz " + t.quiz + "/" + t.quizTotal);
-      if (t.challenges && t.challenges.length) bits.push("Challenge ✓");
+      if (t.challenges && t.challenges.length) bits.push(t.challenges.length + " solved");
       if (bits.length) {
         el.textContent = bits.join(" · ");
         el.hidden = false;
@@ -352,7 +441,10 @@
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("[data-runner]").forEach(initRunner);
     document.querySelectorAll(".quiz").forEach(initQuiz);
+    document.querySelectorAll(".markscheme").forEach(initMarkScheme);
     showProgress();
+    showQuestionStatus();
+    initLibrary();
     initPlayground();
     const navToggle = document.getElementById("nav-toggle");
     if (navToggle) navToggle.addEventListener("click", () => document.body.classList.toggle("nav-open"));
